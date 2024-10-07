@@ -23,10 +23,18 @@ namespace WebApplication9Municipal_Billing_System.Models
             public string Password { get; set; } = string.Empty;
 
 
+
+
             [Required(ErrorMessage = "Please confirm your password")]
             [DataType(DataType.Password)]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; } = string.Empty;  // Ensure this matches Password
+
+            [Required(ErrorMessage = "Id Number is required")]
+            [StringLength(13, MinimumLength = 13, ErrorMessage = "Id Number must be exactly 13 characters long")]
+            [RegularExpression(@"^\d{13}$", ErrorMessage = "Id Number must be numeric and 13 digits long")]
+            public string IdNumber { get; set; } = string.Empty;
+
         //public enum UserTypeList
         //{
         //    Admin, User

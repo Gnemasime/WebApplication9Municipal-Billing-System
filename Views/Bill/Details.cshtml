@@ -1,0 +1,22 @@
+@model WebApplication9Municipal_Billing_System.Models.Bill
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container">
+    <h2>Details</h2>
+    <dl class="row">
+        <dt class="col-sm-2">Bill ID</dt>
+        <dd class="col-sm-10">@Model.BillId</dd>
+        
+        <!-- Add other details as needed -->
+        
+        <dt class="col-sm-2">Total Cost</dt>
+        <dd class="col-sm-10">@Model.TotalCost</dd>
+    </dl>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.BillId" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
+        <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to List</a>
+    </div>
+</div>

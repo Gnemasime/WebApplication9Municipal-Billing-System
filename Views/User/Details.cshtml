@@ -1,0 +1,23 @@
+@model WebApplication9Municipal_Billing_System.Models.Reg
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<h2>User Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name @Model.Surname</h5>
+        <p class="card-text">
+            <strong>Email:</strong> @Model.Email<br />
+            <strong>Id Number:</strong> @Model.IdNumber
+        </p>
+        <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>

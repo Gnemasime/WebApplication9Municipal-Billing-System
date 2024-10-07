@@ -43,6 +43,7 @@ namespace WebApplication9Municipal_Billing_System.Controllers
                     Name = model.Name,
                     Surname = model.Surname,
                     Email = model.Email,
+                    IdNumber = model.IdNumber,
                     Password = model.Password,
                     ConfirmPassword = model.ConfirmPassword
                 };
