@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,66 +7,33 @@ namespace WebApplication9Municipal_Billing_System.Models
     public class Bill
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int BillId { get; set; }
+        public int BillId { get; set; } // Unique identifier for the bill
+        [ForeignKey("RegUserId")]
 
-        // Foreign Key for User
-        public int UserId { get; set; }
+        public int RegUserId { get; set; } // Foreign key to the user (registered user)
 
-        // Foreign Key for Water
-        public int WaterId { get; set; }
+        [Required]
+        public decimal Amount { get; set; } // Amount due for the bill
 
-        // Foreign Key for Electricity
-        public int ElectricityId { get; set; }
-        public int TarriffId {get;set;}
+        [Required]
+        public DateTime DueDate { get; set; } // Due date for the bill
 
-        public decimal BasicCost { get; set; } // Combined cost of services before discount
-        public decimal TarriffDiscount { get; set; } // Discount based on tariff
+        public Status Status { get; set; } // Status of the bill (e.g., unpaid, paid, overdue)
 
-        public decimal TotalCost { get; set; } // Final calculated total cost
+        public DateTime DateIssued { get; set; } // Date when the bill was issued
 
-        // Navigation properties
-        [ForeignKey("WaterId")]
-        public virtual Water Water { get; set; }
+        [Required]
+        public string InvoiceId { get; set; } // Unique identifier for the invoice (for PayPal)
 
-        [ForeignKey("ElectricityId")]
-        public virtual Electricity Electricity { get; set; }
+        // Navigation property to related user
+        public virtual Reg Reg { get; set; } 
+    }
 
-        [ForeignKey("UserId")]
-        public virtual Reg Reg { get; set; } // Assuming 'Reg' is the User entity
-        
-          [ForeignKey("TarriffId")]
-        public virtual Tarriff Tarriff { get; set; } // Assuming 'Reg' is the User entity
-
-        // Method to calculate basic cost (sum of water and electricity costs)
-        public decimal CalculateBasicCost()
-        {
-            // Assuming Water and Electricity objects are loaded with their respective costs
-            decimal waterCost = Water?.Cost ?? 0; // Use 0 if Water is null
-            decimal electricityCost = Electricity?.Cost ?? 0; // Use 0 if Electricity is null
-
-            BasicCost = waterCost + electricityCost;
-            return BasicCost;
-        }
-
-        public decimal TarriffDiscountRate()
-        {
-           decimal  disc = Tarriff.DiscRate;
-           decimal rate = disc / 100;
-
-           return rate;
-        }
-
-
-        // Method to calculate total cost after applying tariff discount
-        public decimal CalculateTotalCost()
-        {
-            // First, calculate the basic cost
-            
-
-            // Apply discount to calculate total cost
-            TotalCost = CalculateBasicCost() - (CalculateBasicCost() * TarriffDiscountRate());
-            return TotalCost;
-        }
+    // Enum for bill status
+    public enum Status
+    {
+        unpaid,
+        paid,
+        overdue
     }
 }

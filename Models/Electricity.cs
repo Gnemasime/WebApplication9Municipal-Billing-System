@@ -3,6 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication9Municipal_Billing_System.Models
 {
+    public enum EStatus{
+        paid,
+        unpaid,
+        overdue
+    }
     public class Electricity
     {
 
@@ -13,15 +18,13 @@ namespace WebApplication9Municipal_Billing_System.Models
     public decimal Usage {get;set;}
     public decimal Rate {get;set;} //Cost Per kWh
     public decimal Cost {get;set;} 
+    public DateTime DueDate{get;set;} = DateTime.Now;
+    public EStatus status {get;set;}
 
     // Foreign key for User
-    public int UserId { get; set; }
-    // Navigation property to associate this tariff with a User
-    public Reg Reg  { get; set; }
+     [ForeignKey("RegUserId")]
+    public int RegUserId { get; set; }
+    public virtual Reg Reg { get; set; }
+  }
 
-    public decimal ElectricCost()
-    {
-        return Usage * Rate;
-    }
-    }
 }

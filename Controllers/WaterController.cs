@@ -1,6 +1,11 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication9Municipal_Billing_System.Models;
+
 
 namespace WebApplication9Municipal_Billing_System.Controllers
 {
@@ -14,30 +19,78 @@ namespace WebApplication9Municipal_Billing_System.Controllers
         }
 
         // GET: Water
-        public async Task<IActionResult> Index()
+
+        // GET: Water
+public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, WStatus? status = null)
+{
+    var query = _context.waters.Include(w => w.Reg).AsQueryable();
+
+    // Apply filtering based on the status
+    if (status.HasValue)
+    {
+        query = query.Where(w => w.status == status.Value);
+    }
+
+    var waters = await query
+        .OrderBy(w => w.WaterId) // Ensure a consistent order
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    var totalRecords = await query.CountAsync();
+    var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+    ViewBag.CurrentPage = pageNumber;
+    ViewBag.TotalPages = totalPages;
+    ViewBag.SelectedStatus = status;
+
+    return View(waters);
+}
+
+
+
+
+        // GET: Water/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
-            var waterRecords = await _context.waters.Include(w => w.Reg).ToListAsync();
-            return View(waterRecords);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var water = await _context.waters
+                .Include(w => w.Reg)
+                .FirstOrDefaultAsync(m => m.WaterId == id);
+            if (water == null)
+            {
+                return NotFound();
+            }
+
+            return View(water);
         }
 
         // GET: Water/Create
         public IActionResult Create()
         {
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber");
             return View();
         }
 
         // POST: Water/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Water water)
+        public async Task<IActionResult> Create([Bind("WaterId,Usage,DueDate,status,RegUserId")] Water water)
         {
             if (ModelState.IsValid)
             {
+                //water.DueDate= water.DateTime.Now;
+                water.Rate = 0.50m;
                 water.Cost = water.WaterCost();
                 _context.Add(water);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", water.RegUserId);
             return View(water);
         }
 
@@ -54,13 +107,14 @@ namespace WebApplication9Municipal_Billing_System.Controllers
             {
                 return NotFound();
             }
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", water.RegUserId);
             return View(water);
         }
 
         // POST: Water/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Water water)
+        public async Task<IActionResult> Edit(int id, [Bind("WaterId,Usage,RegUserId")] Water water)
         {
             if (id != water.WaterId)
             {
@@ -71,6 +125,7 @@ namespace WebApplication9Municipal_Billing_System.Controllers
             {
                 try
                 {
+                    water.Rate = water.CalcRate();
                     water.Cost = water.WaterCost();
                     _context.Update(water);
                     await _context.SaveChangesAsync();
@@ -81,10 +136,14 @@ namespace WebApplication9Municipal_Billing_System.Controllers
                     {
                         return NotFound();
                     }
-                    throw;
+                    else
+                    {
+                        throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", water.RegUserId);
             return View(water);
         }
 
@@ -96,7 +155,9 @@ namespace WebApplication9Municipal_Billing_System.Controllers
                 return NotFound();
             }
 
-            var water = await _context.waters.Include(w => w.Reg).FirstOrDefaultAsync(m => m.WaterId == id);
+            var water = await _context.waters
+                .Include(w => w.Reg)
+                .FirstOrDefaultAsync(m => m.WaterId == id);
             if (water == null)
             {
                 return NotFound();
@@ -111,11 +172,8 @@ namespace WebApplication9Municipal_Billing_System.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var water = await _context.waters.FindAsync(id);
-            if (water != null)
-            {
-                _context.waters.Remove(water);
-                await _context.SaveChangesAsync();
-            }
+            _context.waters.Remove(water);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

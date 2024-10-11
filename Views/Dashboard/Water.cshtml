@@ -1,11 +1,8 @@
-﻿@{
-    Layout = null;
-}
-@model WebApplication9Municipal_Billing_System.Models.Reg
-@{
-    ViewBag.Title = "Dashboard";
-}
+@model IEnumerable<WebApplication9Municipal_Billing_System.Models.Water>
 
+@{
+    Layout = null; 
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,30 +31,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
 
- <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "User", new { area = "" })">
-                            <i class="fas fa-sign-out-alt"></i> Users
-                        </a>
-                    </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Bill", new { area = "" })">
-                            <i class="fas fa-sign-out-alt"></i> Bills
-                        </a>
-                    </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Water", new { area = "" })">
-                            <i class="fas fa-sign-out-alt"></i> Water
-                        </a>
-                    </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Electricity", new { area = "" })">
-                            <i class="fas fa-sign-out-alt"></i>Electricity
-                        </a>
-                    </li>
+
                     @*</li>*@
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("Login", "Reg", new { area = "" })">
-                            <i class="fas fa-sign-out-alt"></i> Logout
+                            <i class="fas fa-sign-out-alt"></i> Login
                         </a>
                     </li>
                 </ul>
@@ -69,9 +47,42 @@
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="profile-container">
-            <h2>Welcome to the Municipal Billing System</h2>
-            <p>Manage your water, electricity, and other service bills with ease. View unpaid bills, transaction history, and more through our streamlined system.</p>
-            
+          
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Usage (litres)</th>
+                    <th>Rate</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Cost</th>
+                   
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var water in Model)
+                {
+                    <tr>
+                        <td>@water.Usage</td>
+                        <td>@water.Rate.ToString("C")</td>
+                        <td>@water.DueDate.ToShortDateString()</td>
+                        <td>@water.status</td>
+                        <td>@water.Cost.ToString("C")</td>
+                         </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No records found.</div>
+    }
+            </div>
         </div>
     </div>
 
@@ -82,10 +93,3 @@
 
 </body>
 </html>
-
-<!-- Link to the external JS file -->
-<script src="~/js/newscript.js"></script>
-<!-- Link to the external css file -->
-<link rel="stylesheet" href="~/css/newstyle.css">
-
-

@@ -3,6 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication9Municipal_Billing_System.Models
 {
+    public enum WStatus{
+        paid,
+        unpaid,
+        overdue
+    }
     public class Water 
     {
 
@@ -12,16 +17,25 @@ namespace WebApplication9Municipal_Billing_System.Models
     public int WaterId{get;set;}
     public decimal Usage {get;set;}
     public decimal Rate {get;set;} //Cost Per litre
+    public DateTime DueDate{get;set;} 
+    public WStatus status {get;set;}
     public decimal Cost {get;set;} 
  // Foreign key for User
-    public int UserId { get; set; }
-    // Navigation property to associate this tariff with a User
-    public Reg Reg  { get; set; }
+    [ForeignKey("RegUserId")]
+     public int RegUserId { get; set; }
+    public virtual Reg Reg { get; set; }
+
+    public decimal CalcRate()
+    {
+        return 0.50m; // 50c per litre
+    }
 
     public decimal WaterCost()
     {
-        return Usage * Rate ;
+        return Usage * 0.50m ;
     }
+   
+
     
     }
 }

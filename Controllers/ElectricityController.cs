@@ -1,4 +1,8 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication9Municipal_Billing_System.Models;
 
@@ -20,24 +24,46 @@ namespace WebApplication9Municipal_Billing_System.Controllers
             return View(electricityRecords);
         }
 
+        // GET: Electricity/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var electricity = await _context.electricities
+                .Include(e => e.Reg)
+                .FirstOrDefaultAsync(m => m.ElectricityId == id);
+            if (electricity == null)
+            {
+                return NotFound();
+            }
+
+            return View(electricity);
+        }
+
         // GET: Electricity/Create
         public IActionResult Create()
         {
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber");
             return View();
         }
 
         // POST: Electricity/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Electricity electricity)
+        public async Task<IActionResult> Create([Bind("ElectricityId,Usage,RegUserId")] Electricity electricity)
         {
             if (ModelState.IsValid)
             {
-                electricity.Cost = electricity.ElectricCost();
+                electricity.Rate = 3.38m;
+                electricity.Cost = electricity.Usage * 3.38m;
                 _context.Add(electricity);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", electricity.RegUserId);
             return View(electricity);
         }
 
@@ -54,13 +80,14 @@ namespace WebApplication9Municipal_Billing_System.Controllers
             {
                 return NotFound();
             }
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", electricity.RegUserId);
             return View(electricity);
         }
 
         // POST: Electricity/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Electricity electricity)
+        public async Task<IActionResult> Edit(int id, [Bind("ElectricityId,Usage,RegUserId")] Electricity electricity)
         {
             if (id != electricity.ElectricityId)
             {
@@ -71,7 +98,8 @@ namespace WebApplication9Municipal_Billing_System.Controllers
             {
                 try
                 {
-                    electricity.Cost = electricity.ElectricCost();
+                    electricity.Rate = 3.38m;
+                    electricity.Cost = electricity.Usage * 3.38m;
                     _context.Update(electricity);
                     await _context.SaveChangesAsync();
                 }
@@ -81,10 +109,14 @@ namespace WebApplication9Municipal_Billing_System.Controllers
                     {
                         return NotFound();
                     }
-                    throw;
+                    else
+                    {
+                        throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", electricity.RegUserId);
             return View(electricity);
         }
 
@@ -96,7 +128,9 @@ namespace WebApplication9Municipal_Billing_System.Controllers
                 return NotFound();
             }
 
-            var electricity = await _context.electricities.Include(e => e.Reg).FirstOrDefaultAsync(m => m.ElectricityId == id);
+            var electricity = await _context.electricities
+                .Include(e => e.Reg)
+                .FirstOrDefaultAsync(m => m.ElectricityId == id);
             if (electricity == null)
             {
                 return NotFound();
@@ -111,11 +145,8 @@ namespace WebApplication9Municipal_Billing_System.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var electricity = await _context.electricities.FindAsync(id);
-            if (electricity != null)
-            {
-                _context.electricities.Remove(electricity);
-                await _context.SaveChangesAsync();
-            }
+            _context.electricities.Remove(electricity);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

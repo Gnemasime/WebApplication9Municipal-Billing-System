@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication9Municipal_Billing_System.Models;
 
@@ -10,9 +11,11 @@ using WebApplication9Municipal_Billing_System.Models;
 namespace WebApplication9Municipal_Billing_System.Migrations
 {
     [DbContext(typeof(DBContextClassReg))]
-    partial class DBContextClassRegModelSnapshot : ModelSnapshot
+    [Migration("20241011080054_UpdateWaterStatus")]
+    partial class UpdateWaterStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
