@@ -1,10 +1,14 @@
-﻿@{
+@model WebApplication9Municipal_Billing_System.Models.Electricity
+
+@{
+    ViewData["Title"] = "Delete Electricity Usage Record";
+}
+
+
+@{
     Layout = null;
 }
-@model WebApplication9Municipal_Billing_System.Models.Reg
-@{
-    ViewBag.Title = "Dashboard";
-}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,9 +73,27 @@
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="profile-container">
-            <h2>Welcome to the Municipal Billing System</h2>
-            <p>Manage your water, electricity, and other service bills with ease. View unpaid bills, transaction history, and more through our streamlined system.</p>
             
+<h2>Delete Electricity Usage Record</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5>Are you sure you want to delete this record?</h5>
+        <p><strong>Usage:</strong> @Model.Usage kWh</p>
+        <p><strong>Rate:</strong> @Model.Rate per kWh</p>
+        <p><strong>Cost:</strong> @Model.Cost</p>
+        <form asp-action="DeleteConfirmed" method="post">
+            <input type="hidden" asp-for="ElectricityId" />
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancel
+            </a>
+        </form>
+    </div>
+</div>
+
         </div>
     </div>
 
@@ -87,5 +109,3 @@
 <script src="~/js/newscript.js"></script>
 <!-- Link to the external css file -->
 <link rel="stylesheet" href="~/css/newstyle.css">
-
-

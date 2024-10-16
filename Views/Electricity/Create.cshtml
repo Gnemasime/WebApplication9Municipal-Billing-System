@@ -1,10 +1,14 @@
-﻿@{
+@model WebApplication9Municipal_Billing_System.Models.Electricity
+
+@{
+    ViewData["Title"] = "Create Electricity Usage Record";
+}
+
+
+@{
     Layout = null;
 }
-@model WebApplication9Municipal_Billing_System.Models.Reg
-@{
-    ViewBag.Title = "Dashboard";
-}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,9 +73,40 @@
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="profile-container">
-            <h2>Welcome to the Municipal Billing System</h2>
-            <p>Manage your water, electricity, and other service bills with ease. View unpaid bills, transaction history, and more through our streamlined system.</p>
             
+
+<h2>Create Electricity Usage Record</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+     <div class="form-group">
+        <label asp-for="Usage" class="control-label"></label>
+        <input asp-for="Usage" class="form-control" />
+        <span asp-validation-for="Usage" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="RegUserId" class="control-label"></label>
+        <select asp-for="RegUserId" class ="form-control" asp-items="@ViewBag.RegUserId"></select>
+        <span asp-validation-for="RegUserId" class="text-danger"></span>
+    </div>
+
+    <!-- Additional fields can be added here -->
+
+   
+   
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Create
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </form>
+    </div>
+</div>
+      @Html.AntiForgeryToken()
         </div>
     </div>
 
@@ -87,5 +122,3 @@
 <script src="~/js/newscript.js"></script>
 <!-- Link to the external css file -->
 <link rel="stylesheet" href="~/css/newstyle.css">
-
-

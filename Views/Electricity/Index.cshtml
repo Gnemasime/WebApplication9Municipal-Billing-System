@@ -1,10 +1,14 @@
-﻿@{
+@model IEnumerable<WebApplication9Municipal_Billing_System.Models.Electricity>
+
+@{
+    ViewData["Title"] = "Electricity Usage Records";
+}
+
+
+@{
     Layout = null;
 }
-@model WebApplication9Municipal_Billing_System.Models.Reg
-@{
-    ViewBag.Title = "Dashboard";
-}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,16 +73,53 @@
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="profile-container">
-            <h2>Welcome to the Municipal Billing System</h2>
-            <p>Manage your water, electricity, and other service bills with ease. View unpaid bills, transaction history, and more through our streamlined system.</p>
             
+
+<h2>Electricity Usage Records</h2>
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Electricity Usage
+    </a>
+</div>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>#</th>
+            <th>Usage (kWh)</th>
+            <th>Rate (per kWh)</th>
+            <th>Cost</th>
+            <th>User</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ElectricityId</td>
+                <td>@item.Usage</td>
+                <td>@item.Rate</td>
+                <td>@item.Cost</td>
+                <td>@item.Reg?.Name @item.Reg?.Surname</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ElectricityId" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.ElectricityId" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+     
         </div>
     </div>
 
-    <footer>
-        <br>
-        <p>&copy; 2024 Municipal Billing System. All rights reserved.</p>
-    </footer>
+   
 
 </body>
 </html>
@@ -87,5 +128,3 @@
 <script src="~/js/newscript.js"></script>
 <!-- Link to the external css file -->
 <link rel="stylesheet" href="~/css/newstyle.css">
-
-

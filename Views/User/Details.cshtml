@@ -1,10 +1,14 @@
-﻿@{
+@model WebApplication9Municipal_Billing_System.Models.Reg
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+
+@{
     Layout = null;
 }
-@model WebApplication9Municipal_Billing_System.Models.Reg
-@{
-    ViewBag.Title = "Dashboard";
-}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,8 +73,25 @@
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="profile-container">
-            <h2>Welcome to the Municipal Billing System</h2>
-            <p>Manage your water, electricity, and other service bills with ease. View unpaid bills, transaction history, and more through our streamlined system.</p>
+            
+
+<h2>User Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name @Model.Surname</h5>
+        <p class="card-text">
+            <strong>Email:</strong> @Model.Email<br />
+            <strong>Id Number:</strong> @Model.IdNumber
+        </p>
+        <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
             
         </div>
     </div>
@@ -87,5 +108,3 @@
 <script src="~/js/newscript.js"></script>
 <!-- Link to the external css file -->
 <link rel="stylesheet" href="~/css/newstyle.css">
-
-

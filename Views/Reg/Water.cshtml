@@ -1,0 +1,103 @@
+@model IEnumerable<WebApplication9Municipal_Billing_System.Models.Water>
+
+@{
+    Layout = null; 
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Municipal Billing System - Home</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the external JS file -->
+    <script src="~/js/newscript.js"></script>
+    <!-- Link to the external css file -->
+    <link rel="stylesheet" href="~/css/newstyle.css">
+
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="home.php">Municipal Billing System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+
+
+                    @*</li>*@
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Login", "Reg", new { area = "" })">
+                            <i class="fas fa-sign-out-alt"></i> Login
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="profile-container">
+          
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Usage (litres)</th>
+                    <th>Rate</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Cost</th>
+                    <th>Action</th>
+                   
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var water in Model)
+                {
+                    <tr>
+                        <td>@water.Usage</td>
+                        <td>@water.Rate.ToString("C")</td>
+                        <td>@water.DueDate.ToShortDateString()</td>
+                        <td>@water.status</td>
+                        <td>@water.Cost.ToString("C")</td>
+                         <td>
+                    @if (water.status == WStatus.unpaid || water.status == WStatus.overdue)
+                    {
+                       <form asp-action="CreatePayment" method="post">
+                            <input type="hidden" name="amount" value="@water.Cost" />
+                            <input type="hidden" name="waterId" value="@water.WaterId" />
+                            <button type="submit" class="btn btn-primary">Pay Now</button>
+                        </form>
+                    }
+                </td>
+                         </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No records found.</div>
+    }
+            </div>
+        </div>
+    </div>
+   <script src="https://www.paypal.com/sdk/js?client-id=AdXHEP1jTg0J_HDMelGoKzkmXiJqg65ZVFa8ibAfReLDAq0XecE9z0bGuVfNjLFHtIxOkd-0Mr142NJt&currency=USD"></script>
+   
+
+</body>
+</html>
