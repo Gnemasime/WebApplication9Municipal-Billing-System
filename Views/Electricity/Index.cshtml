@@ -3,70 +3,52 @@
 @{  
    ViewData["Title"] = "Index";  
 }  
-  
+  <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="profile-container">
+
 <h1>Electricity</h1>  
+ 
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create New
+    </a>
+</div>  
   
-<p>  
-   <a asp-action="Create">Create New</a>  
-</p>  
-<table class="table">  
-   <thead>  
+<table class="table table-bordered table-striped" style="background-color: #f9f9f9;">   
+   <thead class="thead-dark">  
       <tr>  
-        <th>  
-           @Html.DisplayNameFor(model => model.ElectricityId)  
-        </th>  
-        <th>  
-           @Html.DisplayNameFor(model => model.Usage)  
-        </th>  
-        <th>  
-           @Html.DisplayNameFor(model => model.Rate)  
-        </th>  
-        <th>  
-           @Html.DisplayNameFor(model => model.Cost)  
-        </th>  
-        <th>  
-           @Html.DisplayNameFor(model => model.DueDate)  
-        </th>  
-        <th>  
-           @Html.DisplayNameFor(model => model.status)  
-        </th>  
-        <th>  
-           @Html.DisplayNameFor(model => model.RegUserId)  
-        </th>  
-        <th></th>  
+        <th>Electricity Id</th>  
+        <th>Usage</th>  
+        <th>Rate</th>  
+        <th>Cost</th>  
+        <th>Due Date</th>  
+        <th>Status</th>  
+        <th>Reg User Id</th>  
+        <th>Action</th>  
       </tr>  
    </thead>  
    <tbody>  
       @foreach (var item in Model)  
       {  
         <tr>  
+           <td>@item.ElectricityId</td>  
+           <td>@item.Usage</td>  
+           <td>@item.Rate</td>  
+           <td>@item.Cost</td>  
+           <td>@item.DueDate</td>  
+           <td>@item.status</td>  
+           <td>@item.RegUserId</td>  
            <td>  
-              @Html.DisplayFor(modelItem => item.ElectricityId)  
-           </td>  
-           <td>  
-              @Html.DisplayFor(modelItem => item.Usage)  
-           </td>  
-           <td>  
-              @Html.DisplayFor(modelItem => item.Rate)  
-           </td>  
-           <td>  
-              @Html.DisplayFor(modelItem => item.Cost)  
-           </td>  
-           <td>  
-              @Html.DisplayFor(modelItem => item.DueDate)  
-           </td>  
-           <td>  
-              @Html.DisplayFor(modelItem => item.status)  
-           </td>  
-           <td>  
-              @Html.DisplayFor(modelItem => item.RegUserId)  
-           </td>  
-           <td>  
-              <a asp-action="Edit" asp-route-id="@item.ElectricityId">Edit</a> |  
-              <a asp-action="Details" asp-route-id="@item.ElectricityId">Details</a> |  
-              <a asp-action="Delete" asp-route-id="@item.ElectricityId">Delete</a>  
+    <a asp-action="Details" asp-route-id="@item.ElectricityId" class="btn btn-info">    <i class="fas fa-eye"></i> View
+                    </a> 
+              <a asp-action="Edit" asp-route-id="@item.ElectricityId" class="btn btn-secondary"> <i class="fas fa-edit"></i> Edit</a> 
+                
+              <a asp-action="Delete" asp-route-id="@item.ElectricityId" class="btn btn-danger"> <i class="fas fa-trash"></i> Delete</a>  
            </td>  
         </tr>  
       }  
    </tbody>  
 </table>
+        </div>
+    </div>

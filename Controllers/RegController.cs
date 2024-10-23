@@ -107,7 +107,7 @@ namespace WebApplication9Municipal_Billing_System.Controllers
             if (ModelState.IsValid)
             {
                 // Hardcoded admin login (for testing purposes)
-                if (model.Email == "admin@gmail.com" && model.Password == "admin@0123")
+                if ((model.Email == "admin@gmail.com" && model.Password == "admin@0123") || (model.Email == "junioradmin@gmail.com" && model.Password == "admin@0123"))
                 {
                     return RedirectToAction("Dashboard");
                 }
