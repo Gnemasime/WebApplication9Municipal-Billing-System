@@ -1,6 +1,9 @@
-﻿@{
+
+
+@{
     Layout = null; 
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,18 +56,40 @@
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="profile-container">
-            <h2>Welcome to the Municipal Billing System</h2>
-            <p>Manage your water, electricity, and other service bills with ease. View unpaid bills, transaction history, and more through our streamlined system.</p>
-            <div class="cta">
-                <a href="@Url.Action("Login", "Reg", new { area = "" })">Go to Dashboard</a>
-            </div>
+           <h2 class="text-center mb-4">Latest News on Electricity and Water</h2>
+    
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger text-center">@Html.Raw(ViewBag.ErrorMessage)</div>
+    }
+
+    <div class="row">
+        @if (ViewBag.Articles != null)
+        {
+            foreach (var article in ViewBag.Articles)
+            {
+                <div class="col-md-4">
+                    <div class="card news-card">
+                        <img src="@article.UrlToImage ?? "https://via.placeholder.com/300x200?text=No+Image"" alt="Article Image" />
+                        <div class="card-body">
+                            <h5 class="card-title">@article.Title</h5>
+                            <p class="card-text">@article.Description</p>
+                            <p class="text-muted">Published on @article.PublishedAt by @article.Source</p>
+                            <a href="@article.Url" target="_blank" class="btn btn-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center">No news articles found related to electricity or water.</p>
+        }
+    </div>
         </div>
     </div>
 
-    <footer>
-        <br>
-        <p>&copy; 2024 Municipal Billing System. All rights reserved.</p>
-    </footer>
+   
 
 </body>
 </html>

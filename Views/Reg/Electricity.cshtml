@@ -1,6 +1,4 @@
-@using Azure
-@using Microsoft.AspNetCore.Mvc.RazorPages
-@model IEnumerable<WebApplication9Municipal_Billing_System.Models.Water>
+@model IEnumerable<WebApplication9Municipal_Billing_System.Models.Electricity>
 
 @{
     Layout = null; 
@@ -48,7 +46,7 @@
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
-       <li class="nav-item">
+      <li class="nav-item">
     <a class="nav-link" href="@Url.Action("Water", "Reg", new { area = "" })">
         <i class="fas fa-tint"></i> Water
     </a>
@@ -78,9 +76,10 @@
         <div class="profile-container">
           
 <div class="container mt-4">
-    <h2>Water</h2>
+    <h2>Electricity</h2>
+
 @{
-    var statuses = Enum.GetValues(typeof(WStatus)).Cast<WStatus>();
+    var statuses = Enum.GetValues(typeof(EStatus)).Cast<EStatus>();
 }
 
 <form method="get">
@@ -95,7 +94,6 @@
     <input type="hidden" name="pageNumber" value="@ViewBag.CurrentPage" />
     <input type="submit" value="Filter" />
 </form>
-
     @if (Model != null && Model.Any())
     {
         <table class="table table-striped">
@@ -112,20 +110,20 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var water in Model)
+                @foreach (var electricity in Model)
                 {
                     <tr>
-                        <td>@water.WaterId</td>
-                        <td>@water.Usage</td>
-                        <td>@water.Rate.ToString("C")</td>
-                        <td>@water.DueDate.ToShortDateString()</td>
-                        <td>@water.status</td>
-                        <td>@water.Cost.ToString("C")</td>
+                        <td>@electricity.ElectricityId</td>
+                        <td>@electricity.Usage</td>
+                        <td>@electricity.Rate.ToString("C")</td>
+                        <td>@electricity.DueDate.ToShortDateString()</td>
+                        <td>@electricity.status</td>
+                        <td>@electricity.Cost.ToString("C")</td>
                          <td>
-                    @if (water.status == WStatus.unpaid || water.status == WStatus.overdue)
+                    @if (electricity.status == EStatus.unpaid || electricity.status == EStatus.overdue)
                     {
-                       <a href="@Url.Action("Pay", "Reg", new { waterId = @water.WaterId, amount = @water.Cost })" class="btn btn-primary">Pay Now with PayPal</a>
-
+                       <a href="@Url.Action("Pay", "Reg", new { waterId = @electricity.ElectricityId, amount = @electricity.Cost })" class="btn btn-primary">Pay Now with PayPal</a>
+}
                     }
                 </td>
                          </tr>
@@ -138,13 +136,13 @@
         <div class="alert alert-info">No records found.</div>
     }
 
-            
+        
 @if (ViewBag.TotalPages > 1)
 {
     <div>
         @if (ViewBag.CurrentPage > 1)
         {
-            <a asp-action="Water" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)">Previous</a>
+            <a asp-action="Electricity" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)">Previous</a>
         }
 
         @for (int i = 1; i <= ViewBag.TotalPages; i++)
@@ -155,18 +153,19 @@
             }
             else
             {
-                <a asp-action="Water" asp-route-pageNumber="@i">@i</a>
+                <a asp-action="Electricity" asp-route-pageNumber="@i">@i</a>
             }
         }
 
         @if (ViewBag.CurrentPage < ViewBag.TotalPages)
         {
-            <a asp-action="Water" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)">Next</a>
+            <a asp-action="Electricity" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)">Next</a>
         }
     </div>
-}  
+}   
 
-          </div>
+
+            </div>
         </div>
     </div>
 

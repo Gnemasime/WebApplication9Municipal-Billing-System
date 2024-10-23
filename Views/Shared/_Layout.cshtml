@@ -5,43 +5,325 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - WebApplication9Municipal_Billing_System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/WebApplication9Municipal_Billing_System.styles.css" asp-append-version="true" />
+      <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Select2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
+@*<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApplication9Municipal_Billing_System.styles.css" asp-append-version="true" />*@
 </head>
+ <style>
+ /* General Body Styling */
+body {
+    background: linear-gradient(135deg, #e0e5e9, #c2c9d1); /* Light gradient background */
+    background-blend-mode: overlay; /* Blends colors for a more dynamic effect */
+    display: flex;
+    color: #333; /* Dark gray text color for readability */
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background: linear-gradient(135deg, #ff6f00, #ff3d00); /* Fiery gradient background */
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar h2 {
+    color: #fff; /* White text for the sidebar header */
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    font-size: 22px; /* Slightly larger font size */
+    letter-spacing: 2px; /* Increased letter spacing */
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed h2 {
+    opacity: 0;
+}
+
+.sidebar .nav-item {
+    width: 100%;
+}
+
+.sidebar .nav-link {
+    color: white; /* White text for links */
+    padding: 15px;
+    text-align: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    border-radius: 5px; /* Added rounded corners for better visual */
+    background: rgba(255, 255, 255, 0.1); /* Slightly transparent background for glassy effect */
+    backdrop-filter: blur(10px); /* Glassy blur effect */
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+    font-size: 18px;
+    transition: margin 0.3s ease;
+}
+
+.sidebar.collapsed .nav-link i {
+    margin-right: 0;
+}
+
+.sidebar.collapsed .nav-link span {
+    display: none;
+}
+
+.sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.3); /* Lighter glass effect on hover */
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect */
+}
+
+/* Navbar Styling */
+.navbar-top {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Semi-transparent background for a glassy look */
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    justify-content: space-between;
+    backdrop-filter: blur(10px); /* Glassy blur effect */
+    transition: margin-left 0.3s ease;
+}
+
+.navbar-top .navbar-toggler {
+    border: none;
+    color: white;
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.navbar-top .user-info {
+    color: white;
+    font-size: 16px;
+}
+
+/* Main Content Styling */
+.main-content {
+    margin-left: 250px;
+    padding: 80px 20px 20px; /* Added top padding to avoid navbar overlap */
+    transition: margin-left 0.3s ease;
+    width: 100%;
+    position: relative;
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9); /* Slightly transparent white background for a glassy effect */
+    backdrop-filter: blur(8px); /* Glassy blur effect */
+    transition: box-shadow 0.3s ease; /* Smooth shadow transition */
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+/* Button Styling */
+.btn-animated {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background: linear-gradient(135deg, #ff6f00, #ff3d00); /* Fiery gradient background */
+    border: 2px solid transparent; /* Transparent border to highlight gradient background */
+    border-radius: 50px;
+    text-transform: uppercase;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    transition: background-color 0.4s, color 0.4s, transform 0.3s ease; /* Added transform effect */
+    margin: 10px;
+    z-index: 1;
+    font-weight: normal; /* Removed font weight */
+}
+
+.btn-animated::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: rgba(255, 255, 255, 0.2); /* Glassy shimmer effect */
+    transition: transform 0.4s ease;
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.btn-animated:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.btn-animated:hover {
+    background: white;
+    color: #ff3d00; /* Text color changes to fiery red */
+    border-color: #ff3d00; /* Border color matches the button background */
+    transform: scale(1.05); /* Slightly enlarges button on hover */
+}
+
+/* Container Styling */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8); /* Slightly transparent white background for glassy effect */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for a lifted effect */
+    backdrop-filter: blur(10px); /* Glassy blur effect */
+    transition: box-shadow 0.3s ease; /* Smooth shadow transition */
+}
+
+.container:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+/* Lighting Effects */
+@@keyframes lighting {
+    0% {
+        opacity: 0.5;
+        filter: brightness(100%);
+    }
+    50% {
+        opacity: 1;
+        filter: brightness(120%);
+    }
+    100% {
+        opacity: 0.5;
+        filter: brightness(100%);
+    }
+}
+
+.main-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1); /* Subtle light overlay */
+    opacity: 0.2;
+    animation: lighting 2s infinite ease-in-out; /* Lighting animation effect */
+    z-index: -1; /* Behind the content */
+}
+
+/* Heading Styles */
+h1, h2, h3, h4, h5, h6 {
+    color: #333; /* Dark gray text for all headings */
+    font-family: 'Arial', sans-serif; /* Clean, modern font */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for better readability */
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: normal; /* Removed font weight */
+}
+
+h1 {
+    font-size: 2.5rem; /* Larger font size for h1 */
+}
+
+h2 {
+    font-size: 2rem; /* Slightly smaller than h1 */
+}
+
+h3 {
+    font-size: 1.75rem; /* Smaller than h2 */
+}
+
+h4 {
+    font-size: 1.5rem; /* Smaller than h3 */
+}
+
+h5 {
+    font-size: 1.25rem; /* Smaller than h4 */
+}
+
+h6 {
+    font-size: 1rem; /* Smallest heading size */
+}
+
+
+    </style>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebApplication9Municipal_Billing_System</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+    <div class="navbar-top">
+        <button class="navbar-toggler" type="button" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <span class="user-info">Welcome, Admin</span>
+    </div>
+                 <!-- Sidebar -->
+    <div class="sidebar" id="sidebar"><br><br>
+        <h2>Admin Panel</h2>
+        <ul class="nav flex-column" style=>
+                        <li class="nav-item" style="font-size: 1,2rem;">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Users</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Water" asp-action="Index">Water</a>
                         </li>
                     </ul>
-                    <partial name="_LoginPartial" />
+                    @*<partial name="_LoginPartial" />*@
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
+       
+    <!-- Main Content -->
+<div class="main-content">
+    <div class="container mt-4">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - WebApplication9Municipal_Billing_System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+</div>
+   
     </footer>
+    <!-- includes/footer.php -->
+    <!-- Bootstrap JS and Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2
+            $('.select2').select2({
+                placeholder: "Select Meter Number",
+                allowClear: true
+            });
+
+            // Sidebar Toggle Functionality
+            $('#sidebarToggle').click(function() {
+                $('#sidebar').toggleClass('collapsed');
+                $('.main-content').toggleClass('collapsed');
+            });
+        });
+    </script>
+    <!-- jQuery (Bootstrap 5 uses native JavaScript, jQuery is optional) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -22,7 +22,7 @@ namespace WebApplication9Municipal_Billing_System.Models
     public decimal Cost {get;set;} 
  // Foreign key for User
     [ForeignKey("RegUserId")]
-     public int RegUserId { get; set; }
+    public int RegUserId { get; set; }
     public virtual Reg Reg { get; set; }
 
     public decimal CalcRate()

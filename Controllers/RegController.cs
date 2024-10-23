@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PayPal;
@@ -7,21 +8,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication9Municipal_Billing_System.Models;
+using WebApplication9Municipal_Billing_System.ViewModel;
+//using WebApplication9Municipal_Billing_System.Services;
 
 namespace WebApplication9Municipal_Billing_System.Controllers
 {
     public class RegController : Controller
     {
+       // private readonly NewsService _newsService;
         private readonly DBContextClassReg _dbContext;
+        private readonly IConfiguration _configuration;
         // PayPal Live API credentials
         private readonly string clientId = "AdXHEP1jTg0J_HDMelGoKzkmXiJqg65ZVFa8ibAfReLDAq0XecE9z0bGuVfNjLFHtIxOkd-0Mr142NJt"; // Replace with your live client ID
         private readonly string clientSecret = "EBkxRjpt0YuacBgg5WwX2S6tDSu7xV-gcovLblYrpsTzeBurBqP_3P3CUEfqaNUhREvaZeYzYVhotyn8"; // Replace with your live client secret
 
         // Constructor that injects DBContextClassReg
-        public RegController(DBContextClassReg db)
+        public RegController(DBContextClassReg db, IConfiguration con)
         {
             _dbContext = db;
+            _configuration = con;
+          //  _newsService = newsService;
         }
+
+      /*   public async Task<IActionResult> ElectricityNews()
+        {
+            var articles = await _newsService.GetNewsAsync();
+
+            ViewBag.Articles = articles;
+            //ViewBag.ErrorMessage = errorMessage;
+
+            return View();
+        }*/
 
         // GET: Reg (Display list of registered users)
         public async Task<IActionResult> Users()
@@ -115,14 +132,53 @@ namespace WebApplication9Municipal_Billing_System.Controllers
         }
 
         // GET: Dashboard (Admin dashboard)
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
-            return View("Dashboard");
+            var totalUsers = await _dbContext.Regs.CountAsync();
+            var activeWBills = await _dbContext.waters.CountAsync(b => b.status == WStatus.unpaid);
+            var activeEBills = await _dbContext.electricities.CountAsync(b => b.status == EStatus.unpaid);
+
+            var waterTotal = await _dbContext.waters.SumAsync(t => t.Cost )  ;
+            var electricityTotal = await _dbContext.electricities.SumAsync(t => t.Cost)  ;
+
+            var paidBills = await _dbContext.waters.CountAsync(b => b.status == WStatus.paid);
+            var unpaidBills = await _dbContext.waters.CountAsync(b => b.status == WStatus.unpaid);
+         var overdueBills = await _dbContext.waters.CountAsync(b => b.status == WStatus.overdue);
+
+         ViewBag.TotalUsers = totalUsers;
+    ViewBag.ActiveBills = activeEBills;
+   // ViewBag.TotalRevenue = totalRevenue;
+    ViewBag.WaterTotal = waterTotal;
+    ViewBag.ElectricityTotal = electricityTotal;
+    ViewBag.PaidBills = paidBills;
+    ViewBag.UnpaidBills = unpaidBills;
+    ViewBag.OverdueBills = overdueBills;
+            return View();
         }
 
         // GET: Profile (User profile page)
-        public IActionResult Profile()
+        public async Task<IActionResult> ProfileAsync()
         {
+            // Get the current user's ID from the session
+           var userId = HttpContext.Session.GetInt32("UserId");
+
+             var wpaidCount = await _dbContext.waters.CountAsync(b => b.RegUserId == userId && b.status ==  WStatus.paid);
+            var epaidCount = await _dbContext.electricities.CountAsync(b => b.RegUserId == userId && b.status == EStatus.paid);
+            var wunpaidCount = await _dbContext.waters.CountAsync(b => b.RegUserId == userId && b.status == WStatus.unpaid);
+            var eunpaidCount = await _dbContext.electricities.CountAsync(b => b.RegUserId == userId && b.status == EStatus.unpaid);
+             var woverdueCount = await _dbContext.waters.CountAsync(b => b.RegUserId == userId && b.status == WStatus.overdue);
+            var eoverdueCount = await _dbContext.electricities.CountAsync(b => b.RegUserId == userId && b.status == EStatus.overdue);
+
+            var email = HttpContext.Session.GetString("email");
+
+            ViewBag.WaterPaidCount = wpaidCount;
+            ViewBag.ElectricityPaidCount = epaidCount;
+            ViewBag.WaterUnpaidCount = wunpaidCount;
+            ViewBag.ElectricityUnpaidCount = eunpaidCount;
+              ViewBag.WaterOverdueCount = woverdueCount;
+            ViewBag.ElectricityOverdueCount = eoverdueCount;
+            
+            ViewBag.Email = email;
             return View();
         }
 
@@ -131,111 +187,166 @@ namespace WebApplication9Municipal_Billing_System.Controllers
         {
             return View();
         }
-
-        // GET: /Water/UserDashboard
-        [HttpGet]
-        public async Task<IActionResult> Water()
-        {
-            // Get the current user's ID from the session
-            var userId = HttpContext.Session.GetInt32("UserId");
-
-            // Redirect to login if not logged in
-            if (userId == null)
-            {
-                return RedirectToAction("Index", "Reg");
-            }
-
-            // Fetch water records associated with the logged-in user
-            var waters = await _dbContext.waters
-                .Where(w => w.RegUserId == userId.Value) // Filter by user ID
-                .Include(w => w.Reg)
-                .ToListAsync();
-
-            return View(waters);
-        }
-
-        // POST: Create Payment
-       [HttpPost]
-public IActionResult CreatePayment(decimal amount, int waterId)
+         // GET: /Electricity/UserDashboard
+       public async Task<IActionResult> Electricity(int page = 1, int pageSize = 10,EStatus? status = null)
 {
-    if (amount <= 0)
+    // Get the current user's ID from the session
+    var userId = HttpContext.Session.GetInt32("UserId");
+
+    // Redirect to login if not logged in
+    if (userId == null)
     {
-        ModelState.AddModelError("", "Amount must be greater than zero.");
-        return View(); // Return an appropriate view to inform the user of the error
+        return RedirectToAction("Index", "Reg");
     }
 
-    var apiContext = new APIContext(new OAuthTokenCredential(clientId, clientSecret).GetAccessToken());
-    var payment = new Payment
-    {
-        intent = "sale",
-        payer = new Payer { payment_method = "paypal" },
-        transactions = new List<Transaction>
-        {
-            new Transaction
-            {
-                description = "Water Bill Payment",
-                invoice_number = waterId.ToString(), // Use WaterId as invoice number
-                amount = new Amount
-                {
-                    currency = "ZAR",
-                    total = amount.ToString("F2") // Ensure amount is formatted correctly
-                }
-            }
-        },
-        redirect_urls = new RedirectUrls
-        {
-            cancel_url = Url.Action("PaymentCancelled", "Reg", null, Request.Scheme),
-            return_url = Url.Action("PaymentSuccess", "Reg", new { waterId }, Request.Scheme)
-        }
-    };
+    // Fetch electricity records associated with the logged-in user
+   
+    var query = _dbContext.electricities
+        .Where(e => e.RegUserId == userId.Value) // Filter by user ID
+        .Include(e => e.Reg);
 
-    try
-    {
-        Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(payment)); // Log payment object
-        var createdPayment = payment.Create(apiContext);
-        var approvalUrl = createdPayment.links.FirstOrDefault(l => l.rel.ToLower() == "approval_url")?.href;
+    // Get total count for pagination
+    var totalCount = await query.CountAsync();
 
-        return Redirect(approvalUrl);
-    }
-    catch (PaymentsException ex)
-    {
-        Console.WriteLine($"PayPal Payment Error: {ex.Message}");
-        if (ex.Response != null)
-        {
-            Console.WriteLine($"Error Response: {ex.Response}");
-        }
-        ModelState.AddModelError("", "Payment processing failed. Please try again.");
-        return View(); // Return an appropriate view to inform the user of the error
-    }
+    // Fetch records with pagination
+    var electricities = await query
+        .OrderBy(e => e.ElectricityId) // Adjust to the appropriate ID
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+   
+    var totalRecords = await query.CountAsync();
+    var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+    ViewBag.CurrentPage = page;
+    ViewBag.TotalPages = totalPages;
+    ViewBag.SelectedStatus = status;
+
+    return View(electricities);
 }
 
 
-        // GET: Payment Success
+        // GET: /Water/UserDashboard
         [HttpGet]
-        public async Task<IActionResult> PaymentSuccess(int waterId)
-        {
-            // Fetch the water record and update its status
-            var water = await _dbContext.waters.FirstOrDefaultAsync(w => w.WaterId == waterId);
-            if (water != null)
-            {
-                water.status = WStatus.paid; // Update status to paid
-                await _dbContext.SaveChangesAsync();
-            }
-            return View("PaymentSuccess"); // Create this view to confirm payment
-        }
+         public async Task<IActionResult> Water(int page = 1, int pageSize = 10,WStatus? status = null)
+{
+    // Get the current user's ID from the session
+    var userId = HttpContext.Session.GetInt32("UserId");
 
-        // GET: Payment Cancelled
-        [HttpGet]
-        public IActionResult PaymentCancelled()
-        {
-            return View("PaymentCancelled"); // Create this view to inform about cancellation
-        }
+    // Redirect to login if not logged in
+    if (userId == null)
+    {
+        return RedirectToAction("Index", "Reg");
+    }
 
+    // Fetch electricity records associated with the logged-in user
+   
+    var query = _dbContext.waters
+        .Where(e => e.RegUserId == userId.Value) // Filter by user ID
+        .Include(e => e.Reg);
+
+    // Get total count for pagination
+    var totalCount = await query.CountAsync();
+
+    // Fetch records with pagination
+    var waters = await query
+        .OrderBy(e => e.WaterId) // Adjust to the appropriate ID
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+   
+    var totalRecords = await query.CountAsync();
+    var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+    ViewBag.CurrentPage = page;
+    ViewBag.TotalPages = totalPages;
+    ViewBag.SelectedStatus = status;
+
+    return View(waters);
+}
         // Example logout method to clear session
         public IActionResult Logout()
         {
             HttpContext.Session.Remove("UserId");
             return RedirectToAction("Index");
         }
+
+
+        public IActionResult Pay(int waterId,decimal amount)
+        {
+            var waterBill = _dbContext.waters.Find(waterId);
+            if (waterBill == null || (waterBill.status != WStatus.unpaid && waterBill.status != WStatus.overdue))
+            {
+                return NotFound();
+            }
+
+           // var totalCost = waterBill.WaterCost();
+            var payment = CreatePayment(amount);
+            return Redirect(payment.GetApprovalUrl());
+        }
+
+        private Payment CreatePayment(decimal amount)
+        {
+            var clientId = _configuration["PayPal:ClientId"];
+            var clientSecret = _configuration["PayPal:ClientSecret"];
+            var apiContext = new APIContext(new OAuthTokenCredential(clientId, clientSecret).GetAccessToken());
+
+            var payment = new Payment
+            {
+                intent = "sale",
+                payer = new Payer { payment_method = "paypal" },
+                transactions = new List<Transaction>
+                {
+                    new Transaction
+                    {
+                        description = "Water Bill Payment",
+                        invoice_number = Guid.NewGuid().ToString(),
+                        amount = new Amount
+                        {
+                            currency = "USD",
+                            total = amount.ToString("F2")
+                        }
+                    }
+                },
+                redirect_urls = new RedirectUrls
+                {
+                    cancel_url = Url.Action("Cancel", "Payment", null, Request.Scheme),
+                    return_url = Url.Action("Success", "Payment", null, Request.Scheme)
+                }
+            };
+
+            return payment.Create(apiContext);
+        }
+
+        public IActionResult Success(string paymentId, string token, string PayerID)
+        {
+            var apiContext = new APIContext(new OAuthTokenCredential(
+                _configuration["PayPal:ClientId"],
+                _configuration["PayPal:ClientSecret"]).GetAccessToken());
+
+            var paymentExecution = new PaymentExecution { payer_id = PayerID };
+            var payment = new Payment { id = paymentId };
+
+            var executedPayment = payment.Execute(apiContext, paymentExecution);
+
+            // Update water bill status to paid
+            var waterBill = _dbContext.waters.Find(executedPayment.transactions.First().invoice_number);
+            if (waterBill != null)
+            {
+                waterBill.status = WStatus.paid;
+                _dbContext.Update(waterBill);
+                _dbContext.SaveChanges();
+            }
+
+            return View("PaymentSuccess");
+        }
+
+        public IActionResult Cancel()
+        {
+            return View("PaymentCanceled");
+        }
+       
     }
 }
