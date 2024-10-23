@@ -1,4 +1,7 @@
+@using Org.BouncyCastle.Asn1.Ocsp
+@using Org.BouncyCastle.Asn1.X509
 @model IEnumerable<WebApplication9Municipal_Billing_System.Models.Water>
+@using WebApplication9Municipal_Billing_System.Models;
 
 @{
     ViewData["Title"] = "Water Usage Records";
@@ -6,35 +9,38 @@
 
 
 
-    <!-- Main Content -->
-    <div class="container-fluid">
-        <div class="profile-container">
-            
+<!-- Main Content -->
+<div class="container-fluid">
+    <div class="profile-container">
 
-<h2>Water Usage Records</h2>
 
-<div class="mb-3">
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Add New Water Usage
-    </a>
-</div>
+        <h2>Water Usage Records</h2>
 
-@{
-    var statuses = Enum.GetValues(typeof(WStatus)).Cast<WStatus>();
-}
+        <div class="mb-3">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Water Usage
+            </a>
+        </div>
 
-<form method="get">
-    <select name="status">
-        <option value="">All</option>
-        @foreach (var status in statuses)
-        {
-            var selected = ViewBag.SelectedStatus?.ToString().ToLower() == status.ToString().ToLower() ? "selected=\"selected\"" : "";
-            <option value="@status.ToString().ToLower()" >@status</option>
-        }
-    </select>
-    <input type="hidden" name="pageNumber" value="@ViewBag.CurrentPage" />
-    <input type="submit" value="Filter" />
+
+<form method="get" asp-action="Index">
+    <div class="form-group">
+        <label for="statusFilter">Filter by Status:</label>
+        <select id="statusFilter" name="statusFilter" class="form-control" onchange="this.form.submit()">
+            <option value="">All</option>
+            @foreach (WStatus status in Enum.GetValues(typeof(WStatus)))
+            {
+                var statusValue = status.ToString().ToLower();
+                var selectedAttribute = Context.Request.Query["statusFilter"] == statusValue ? " selected" : "";
+
+                <option value="@statusValue" >
+                    @status
+                </option>
+            }
+        </select>
+    </div>
 </form>
+
 
 
 <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">  
@@ -74,33 +80,8 @@
     </tbody>
 </table>
 
+
      
-@if (ViewBag.TotalPages > 1)
-{
-    <div>
-        @if (ViewBag.CurrentPage > 1)
-        {
-            <a asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)">Previous</a>
-        }
-
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            if (i == ViewBag.CurrentPage)
-            {
-                <strong>@i</strong> 
-            }
-            else
-            {
-                <a asp-action="Index" asp-route-pageNumber="@i">@i</a>
-            }
-        }
-
-        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-        {
-            <a asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)">Next</a>
-        }
-    </div>
-}       
         </div>
     </div>
 

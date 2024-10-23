@@ -1,11 +1,8 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication9Municipal_Billing_System.Models;
-
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace WebApplication9Municipal_Billing_System.Controllers
 {
@@ -19,36 +16,19 @@ namespace WebApplication9Municipal_Billing_System.Controllers
         }
 
         // GET: Water
-
         // GET: Water
-public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, WStatus? status = null)
-{
-    var query = _context.waters.Include(w => w.Reg).AsQueryable();
+        public async Task<IActionResult> Index(WStatus? statusFilter)
+        {
+            var waters = from w in _context.waters.Include(w => w.Reg)
+                         select w;
 
-    // Apply filtering based on the status
-    if (status.HasValue)
-    {
-        query = query.Where(w => w.status == status.Value);
-    }
-
-    var waters = await query
-        .OrderBy(w => w.WaterId) // Ensure a consistent order
-        .Skip((pageNumber - 1) * pageSize)
-        .Take(pageSize)
-        .ToListAsync();
-
-    var totalRecords = await query.CountAsync();
-    var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-
-    ViewBag.CurrentPage = pageNumber;
-    ViewBag.TotalPages = totalPages;
-    ViewBag.SelectedStatus = status;
-
-    return View(waters);
-}
-
-
-
+            if (statusFilter.HasValue)
+            {
+                waters = waters.Where(w => w.status == statusFilter);
+            }
+return View(await waters.ToListAsync());
+        }
+            
 
         // GET: Water/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -72,25 +52,21 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, WS
         // GET: Water/Create
         public IActionResult Create()
         {
-            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber");
             return View();
         }
 
         // POST: Water/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WaterId,Usage,DueDate,status,RegUserId")] Water water)
+        public async Task<IActionResult> Create([Bind("Usage,Rate,DueDate,status,RegUserId")] Water water)
         {
             if (ModelState.IsValid)
             {
-                //water.DueDate= water.DateTime.Now;
-                water.Rate = 0.50m;
-                water.Cost = water.WaterCost();
+                water.Cost = water.WaterCost(); // Calculate cost
                 _context.Add(water);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", water.RegUserId);
             return View(water);
         }
 
@@ -107,14 +83,13 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, WS
             {
                 return NotFound();
             }
-            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", water.RegUserId);
             return View(water);
         }
 
         // POST: Water/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("WaterId,Usage,RegUserId")] Water water)
+        public async Task<IActionResult> Edit(int id, [Bind("WaterId,Usage,Rate,DueDate,status,RegUserId")] Water water)
         {
             if (id != water.WaterId)
             {
@@ -125,8 +100,7 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, WS
             {
                 try
                 {
-                    water.Rate = water.CalcRate();
-                    water.Cost = water.WaterCost();
+                    water.Cost = water.WaterCost(); // Recalculate cost
                     _context.Update(water);
                     await _context.SaveChangesAsync();
                 }
@@ -143,7 +117,6 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, WS
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RegUserId"] = new SelectList(_context.Regs, "UserId", "IdNumber", water.RegUserId);
             return View(water);
         }
 
@@ -179,7 +152,7 @@ public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, WS
 
         private bool WaterExists(int id)
         {
-            return _context.waters.Any(e => e.WaterId == id);
+            return _context.waters.Any(w => w.WaterId == id);
         }
     }
 }

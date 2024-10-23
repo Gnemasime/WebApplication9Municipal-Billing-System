@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApplication9Municipal_Billing_System.Models;
 using WebApplication9Municipal_Billing_System.ViewModel;
-//using WebApplication9Municipal_Billing_System.Services;
+using WebApplication9Municipal_Billing_System.Services;
 
 namespace WebApplication9Municipal_Billing_System.Controllers
 {
@@ -17,28 +17,39 @@ namespace WebApplication9Municipal_Billing_System.Controllers
     {
        // private readonly NewsService _newsService;
         private readonly DBContextClassReg _dbContext;
+        private readonly NewsService _newsService;  
         private readonly IConfiguration _configuration;
         // PayPal Live API credentials
         private readonly string clientId = "AdXHEP1jTg0J_HDMelGoKzkmXiJqg65ZVFa8ibAfReLDAq0XecE9z0bGuVfNjLFHtIxOkd-0Mr142NJt"; // Replace with your live client ID
         private readonly string clientSecret = "EBkxRjpt0YuacBgg5WwX2S6tDSu7xV-gcovLblYrpsTzeBurBqP_3P3CUEfqaNUhREvaZeYzYVhotyn8"; // Replace with your live client secret
 
         // Constructor that injects DBContextClassReg
-        public RegController(DBContextClassReg db, IConfiguration con)
+        public RegController(DBContextClassReg db, IConfiguration con, NewsService newsService)
         {
             _dbContext = db;
             _configuration = con;
-          //  _newsService = newsService;
+           _newsService = newsService;
         }
 
-      /*   public async Task<IActionResult> ElectricityNews()
+        // [HttpGet("electricity-news")]
+        public IActionResult ENews()
         {
-            var articles = await _newsService.GetNewsAsync();
-
-            ViewBag.Articles = articles;
-            //ViewBag.ErrorMessage = errorMessage;
-
-            return View();
-        }*/
+        //  var articles = await _newsService.GetElectricityNewsAsync();
+          //  return View(articles);
+          return View();
+        }
+          public IActionResult WNews()
+        {
+        //  var articles = await _newsService.GetElectricityNewsAsync();
+          //  return View(articles);
+          return View();
+        }
+          public IActionResult Loadshedding()
+        {
+        //  var articles = await _newsService.GetElectricityNewsAsync();
+          //  return View(articles);
+          return View();
+        }
 
         // GET: Reg (Display list of registered users)
         public async Task<IActionResult> Users()

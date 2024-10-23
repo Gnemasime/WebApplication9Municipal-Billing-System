@@ -23,7 +23,7 @@ namespace WebApplication9Municipal_Billing_System.Models
     // Foreign key for User
     [ForeignKey("RegUserId")]
     public int RegUserId { get; set; }
-    public Reg Reg { get; set; }
+    public virtual Reg Reg { get; set; }
   }
 
 }

@@ -1,8 +1,8 @@
-@model IEnumerable<WebApplication9Municipal_Billing_System.Models.Electricity>
 
 @{
     Layout = null; 
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,106 +93,61 @@
         </div>
     </nav>
 
-
     <!-- Main Content -->
     <div class="container-fluid">
         <div class="profile-container">
-          
-<div class="container mt-4">
-    <h2>Electricity</h2>
+           <h2 class="text-center mb-4">Latest News on Electricity </h2>
+            
+    <div id="news-container"></div>
 
-@{
-    var statuses = Enum.GetValues(typeof(EStatus)).Cast<EStatus>();
+    <script>
+const apiKey = '6c55e14d26f2c4c9e9b9d086f5747c1c'; // Replace with your GNews API key
+const query = 'electricity';
+const country = 'ZA'; // South Africa
+
+async function fetchNews() {
+    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&country=${country}&token=${apiKey}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        displayNews(data.articles);
+    } catch (error) {
+        console.error('Error fetching news:', error);
+    }
 }
 
-<form method="get">
-    <select name="status">
-        <option value="">All</option>
-        @foreach (var status in statuses)
-        {
-            var selected = ViewBag.SelectedStatus?.ToString().ToLower() == status.ToString().ToLower() ? "selected=\"selected\"" : "";
-            <option value="@status.ToString().ToLower()" >@status</option>
-        }
-    </select>
-    <input type="hidden" name="pageNumber" value="@ViewBag.CurrentPage" />
-    <input type="submit" value="Filter" />
-</form>
-    @if (Model != null && Model.Any())
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Usage (litres)</th>
-                    <th>Rate</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th>Cost</th>
-                    <th>Action</th>
-                   
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var electricity in Model)
-                {
-                    <tr>
-                        <td>@electricity.ElectricityId</td>
-                        <td>@electricity.Usage</td>
-                        <td>@electricity.Rate.ToString("C")</td>
-                        <td>@electricity.DueDate.ToShortDateString()</td>
-                        <td>@electricity.status</td>
-                        <td>@electricity.Cost.ToString("C")</td>
-                         <td>
-                    @if (electricity.status == EStatus.unpaid || electricity.status == EStatus.overdue)
-                    {
-                       <a href="@Url.Action("Pay", "Reg", new { waterId = @electricity.ElectricityId, amount = @electricity.Cost })" class="btn btn-primary">Pay Now with PayPal</a>
-}
-                    }
-                </td>
-                         </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <div class="alert alert-info">No records found.</div>
-    }
+function displayNews(articles) {
+    const container = document.getElementById('news-container');
+    container.innerHTML = '';
 
-        
-@if (ViewBag.TotalPages > 1)
-{
-    <div>
-        @if (ViewBag.CurrentPage > 1)
-        {
-            <a asp-action="Electricity" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)">Previous</a>
-        }
-
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            if (i == ViewBag.CurrentPage)
-            {
-                <strong>@i</strong> 
-            }
-            else
-            {
-                <a asp-action="Electricity" asp-route-pageNumber="@i">@i</a>
-            }
-        }
-
-        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-        {
-            <a asp-action="Electricity" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)">Next</a>
-        }
-    </div>
-}   
-
-
+    articles.forEach(article => {
+        const articleDiv = document.createElement('div');
+        const imageUrl = article.image || 'https://via.placeholder.com/150'; // Use a placeholder if no image
+        articleDiv.innerHTML = `
+            <div class="card mb-4">
+                <img src="${imageUrl}" class="card-img-top" alt="Article Image" onerror="this.onerror=null; this.src='https://via.placeholder.com/150';">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="${article.url}" target="_blank">${article.title}</a></h5>
+                    <p class="card-text">${article.description}</p>
+                    <p class="card-text"><small class="text-muted">${new Date(article.publishedAt).toLocaleString()}</small></p>
+                </div>
             </div>
+        `;
+        container.appendChild(articleDiv);
+    });
+}
+// Fetch news on page load
+fetchNews();
+
+
+    </script>
         </div>
     </div>
 
-   <script src="https://www.paypal.com/sdk/js?client-id=AdXHEP1jTg0J_HDMelGoKzkmXiJqg65ZVFa8ibAfReLDAq0XecE9z0bGuVfNjLFHtIxOkd-0Mr142NJt&currency=USD"></script>
    
 
 </body>

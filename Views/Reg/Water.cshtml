@@ -48,7 +48,7 @@
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
-       <li class="nav-item">
+    <li class="nav-item">
     <a class="nav-link" href="@Url.Action("Water", "Reg", new { area = "" })">
         <i class="fas fa-tint"></i> Water
     </a>
@@ -59,6 +59,29 @@
         <i class="fas fa-bolt"></i> Electricity
     </a>
 </li>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-newspaper"></i> News
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a class="dropdown-item" href="@Url.Action("Loadshedding", "Reg", new { area = "" })">
+                <i class="fas fa-bolt"></i> Loadshedding 
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="@Url.Action("WNews", "Reg", new { area = "" })">
+                <i class="fas fa-tint"></i> Water
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="@Url.Action("ENews", "Reg", new { area = "" })">
+                <i class="fas fa-bolt"></i> Electricity
+            </a>
+        </li>
+    </ul>
+</li>
+
 
 <li class="nav-item">
     <a class="nav-link" href="@Url.Action("Logout", "Reg", new { area = "" })">
@@ -66,12 +89,12 @@
     </a>
 </li>
 
-
                 </ul>
 
             </div>
         </div>
     </nav>
+
 
     <!-- Main Content -->
     <div class="container-fluid">

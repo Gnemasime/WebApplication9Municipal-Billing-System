@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PayPalCheckoutSdk.Core;
 using WebApplication9Municipal_Billing_System.Data;
-using WebApplication9Municipal_Billing_System.Models;  // Include your models namespace
+using WebApplication9Municipal_Billing_System.Models;
+using WebApplication9Municipal_Billing_System.Services;  // Include your models namespace
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();  // Ensure Identity uses ApplicationDbContext
 
+// Register HttpClient
+builder.Services.AddHttpClient();
+// Register services
+builder.Services.AddScoped<NewsService>();
 builder.Services.AddSession();
 builder.Services.AddControllersWithViews();
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebApplication9Municipal_Billing_System.Services;
 
 namespace WebApplication9Municipal_Billing_System.Models
 {
@@ -15,6 +16,7 @@ namespace WebApplication9Municipal_Billing_System.Models
         public DbSet<Water> waters { get; set; } = null!;
         public DbSet<Tarriff> tarriffs { get; set; } = null!;
         public DbSet<Electricity> electricities { get; set; } = null!;
+    
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
